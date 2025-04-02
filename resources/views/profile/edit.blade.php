@@ -24,6 +24,36 @@
                     @include('profile.partials.delete-user-form')
                 </div>
             </div>
+
+             <!-- Projects created by user -->
+             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
+                <h3 class="text-lg font-medium text-gray-900">
+                    {{ __('Projects Created By Me') }}
+                </h3>
+
+                <ul>
+                    @forelse ($createdProjects as $project)
+                        <li>{{ $project->title }}</li>
+                    @empty
+                        <li>{{ __('No projects created yet.') }}</li>
+                    @endforelse
+                </ul>
+            </div>
+
+            <!-- Projects where user is a member -->
+            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
+                <h3 class="text-lg font-medium text-gray-900">
+                    {{ __('Projects I Am A Member Of') }}
+                </h3>
+
+                <ul>
+                    @forelse ($memberProjects as $project)
+                        <li>{{ $project->title }}</li>
+                    @empty
+                        <li>{{ __('Not a member of any projects yet.') }}</li>
+                    @endforelse
+                </ul>
+            </div>
         </div>
     </div>
 </x-app-layout>

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use App\Models\Project;
 
 class ProfileController extends Controller
 {
@@ -16,8 +17,16 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        $user = $request->user();
+
+        // Access the relationship as a property
+        $createdProjects = $user->projectsLed; 
+        $memberProjects = $user->projects;    
+
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => $user,
+            'createdProjects' => $createdProjects,
+            'memberProjects' => $memberProjects,
         ]);
     }
 
