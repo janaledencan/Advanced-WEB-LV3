@@ -18,6 +18,7 @@
                                 <th>Price</th>
                                 <th>Start Date</th>
                                 <th>End Date</th>
+                                <th>Team Members</th> 
                             </tr>
                         </thead>
                         <tbody>
@@ -28,6 +29,11 @@
                                     <td>{{ $project->price }}</td>
                                     <td>{{ $project->start_date }}</td>
                                     <td>{{ $project->end_date }}</td>
+                                    <td>
+                                        @foreach ($project->members as $member)
+                                            {{ $member->name }}, 
+                                        @endforeach
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
