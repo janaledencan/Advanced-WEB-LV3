@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\SUpport\Facades\Auth;
 
 class ProjectController extends Controller implements HasMiddleware
 {
@@ -18,7 +19,8 @@ class ProjectController extends Controller implements HasMiddleware
     public function index()
     {
         $projects = Project::with('members')->get(); // Load the members relationship
-        return view('projects.index', compact('projects'));
+        $user = Auth::user(); //Getting authenticated user
+        return view('projects.index', compact('projects', 'user'));
     }
 
     public function create()
@@ -53,6 +55,61 @@ class ProjectController extends Controller implements HasMiddleware
             $project->members()->attach($request->team_members);
         }
 
-        return redirect()->route('dashboard')->with('success', 'Projekt uspješno dodan!');
+        return redirect()->route('projects.index')->with('success', 'Projekt uspješno dodan!');
+    }
+
+    public function edit(Project $project)
+    {
+        $users = User::all();
+        return view('projects.edit', compact('project', 'users'));
+    }
+
+    public function update(Request $request, Project $project)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'price' => 'required|numeric',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'team_members' => 'nullable|array',
+            'team_members.*' => 'exists:users,id',
+        ]);
+
+        $project->update([
+            'title' => $request->title,
+            'description' => $request->description,
+            'price' => $request->price,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'completed_jobs' => $request->input('completed_jobs', 0), 
+        ]);
+
+        // Sync team members
+        $project->members()->sync($request->input('team_members', []));
+
+        return redirect()->route('projects.index')->with('success', 'Project updated successfully!');
+    }
+
+    public function destroy(Project $project)
+    {
+        $project->delete();
+
+        return redirect()->route('projects.index')->with('success', 'Project deleted successfully!');
+    }
+
+    public function completeJob(Project $project)
+    {
+        $user = Auth::user();
+
+        // Check if the user is a member of the project
+        if ($project->members()->where('users.id', $user->id)->exists()) {
+            // Toggle the job_completed status
+            $project->members()->updateExistingPivot($user->id, [
+                'job_completed' => true,
+            ]);
+        }
+
+        return redirect()->route('projects.index')->with('success', 'Project job completed!');
     }
 }

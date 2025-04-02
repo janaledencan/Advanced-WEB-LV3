@@ -11,7 +11,6 @@ class Project extends Model
         'title',
         'description',
         'price',
-        'completed_jobs',
         'start_date',
         'end_date',
         'team_members'
@@ -22,6 +21,6 @@ class Project extends Model
     }
 
     public function members(){
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class)->withPivot('job_completed', 'job_description');
     }
 }

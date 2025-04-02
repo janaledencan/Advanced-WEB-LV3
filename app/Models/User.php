@@ -55,6 +55,6 @@ class User extends Authenticatable
     // svaki user moze biti član više projekata
     // Dohvati projekte gdje je korisnik član tima
     public function projects(){
-        return $this->belongsToMany(Project::class);
+        return $this->belongsToMany(Project::class)->withPivot('job_completed', 'job_description');
     }
 }
